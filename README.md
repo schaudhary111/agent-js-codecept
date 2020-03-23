@@ -32,7 +32,7 @@ Example:
   //...
    plugins: {
     reportportal: {
-      enabled: true
+      enabled: true,
       require: '@reportportal/agent-js-codecept',
       token: 'YOUR_TOKEN',
       endpoint: 'http://localhost:8080/api/v1',
