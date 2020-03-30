@@ -1,6 +1,6 @@
 {
   "name": "@reportportal/agent-js-codecept",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reportportal plugin for Codecept JS tests",
   "repository": {
     "type": "git",
