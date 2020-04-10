@@ -68,12 +68,14 @@ module.exports = (config) => {
 
   event.dispatcher.on(event.all.before, () => {
     launchObj = startLaunch();
-    launchObj.promise.catch(err => {
-      output.error('Can`\t connect to ReportPortal');
+    try {
+      await launchObj.promise;
+    } catch (err) {
+      output.error(`❌ Can't connect to ReportPortal, exiting...`);
       output.error(err);
-    });
+      process.exit(1);
+    }
     output.print(`📋 Writing results to ReportPortal: ${config.projectName} > ${config.endpoint}`);
-    debug(`${launchObj.tempId}: The launchId is started.`);
   });
 
   event.dispatcher.on(event.suite.before, (suite) => {
@@ -289,7 +291,7 @@ module.exports = (config) => {
   }
 
   function finishStep(step) {
-    if (!step) return;
+    if (!step || !step.tempId) return;
     debug(`Finishing '${step.toString()}' step`);
 
     return rpClient.finishTestItem(step.tempId, {
