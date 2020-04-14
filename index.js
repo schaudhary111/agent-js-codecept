@@ -200,14 +200,14 @@ module.exports = (config) => {
   }
 
   event.dispatcher.on(event.all.result, async () => {
-    await recorder.promise;
-      debug('Finishing launch...');
-      if (suiteObj) {
-        rpClient.finishTestItem(suiteObj.tempId, {
-          status: suiteStatus,
-        }).promise;
-      }
-      await finishLaunch();
+    // await recorder.promise;
+    debug('Finishing launch...');
+    if (suiteObj) {
+      rpClient.finishTestItem(suiteObj.tempId, {
+        status: suiteStatus,
+      }).promise;
+    }
+    await finishLaunch();
   });
 
   function startLaunch(suiteTitle) {
@@ -251,7 +251,7 @@ module.exports = (config) => {
   async function finishLaunch() {
     try {
       debug(`${launchObj.tempId} Finished launch: ${launchStatus}`)
-      const launch = await rpClient.finishLaunch(launchObj.tempId, {
+      const launch = rpClient.finishLaunch(launchObj.tempId, {
         status: launchStatus,
       });
 
@@ -259,6 +259,7 @@ module.exports = (config) => {
 
       output.print(` 📋 Report #${response.number} saved ➡`, response.link);
     } catch (error) {
+      console.log(error);
       debug(error);
     }
   }
@@ -267,18 +268,24 @@ module.exports = (config) => {
     let metaStepObj = {};
     const metaSteps = metaStepsToArray(step.metaStep);
 
+    // close current metasteps
+    for (let j = currentMetaSteps.length-1; j >= metaSteps.length; j--) {
+      await finishStep(currentMetaSteps[j]);
+    }
+
     for (const i in metaSteps) {
       const metaStep = metaSteps[i];
       if (isEqualMetaStep(metaStep, currentMetaSteps[i])) {
+        metaStep.tempId = currentMetaSteps[i].tempId;
         continue;
       } 
-      // close current metasteps
+      // close metasteps other than current
       for (let j = currentMetaSteps.length-1; j >= i; j--) {
         await finishStep(currentMetaSteps[j]);
         delete currentMetaSteps[j];
       }
 
-      metaStepObj = currentMetaSteps[currentMetaSteps.length - 1] || metaStepObj;
+      metaStepObj = currentMetaSteps[i-1] || metaStepObj;
 
       const isNested = !!metaStepObj.tempId;
       metaStepObj = startTestItem(metaStep.toString(), rp_STEP, metaStepObj.tempId || testObj.tempId);
@@ -291,7 +298,11 @@ module.exports = (config) => {
   }
 
   function finishStep(step) {
-    if (!step || !step.tempId) return;
+    if (!step) return;
+    if (!step.tempId) {
+      debug(`WARNING: '${step.toString()}' step can't be closed, it has no tempId`);
+      return;
+    }
     debug(`Finishing '${step.toString()}' step`);
 
     return rpClient.finishTestItem(step.tempId, {
