@@ -101,7 +101,7 @@ module.exports = (config) => {
   event.dispatcher.on(event.step.before, (step) => {
     recorder.add(async () => {      
       const parent = await startMetaSteps(step);
-      stepObj = startTestItem(step.toString(), rp_STEP, parent.tempId);
+      stepObj = startTestItem(step.toString().slice(0, 300), rp_STEP, parent.tempId);
       step.tempId = stepObj.tempId;
     })
   });
@@ -133,30 +133,32 @@ module.exports = (config) => {
 
       debug(`Attaching screenshot & error to failed step`);
   
-      const screenshot = await attachScreenshot();
+      const screenshot = await attachScreenshot();      
 
       await rpClient.sendLog(step.tempId, {
-        level: 'error',
+        level: 'ERROR',
         message: `${err.stack}`,
         time: step.startTime,
       }, screenshot).promise; 
+
     }
+
+    if (!test.tempId) return;
+
+    debug(`${test.tempId}: Test '${test.title}' failed.`);
 
     if (!failedStep) {
-      rpClient.sendLog(test.tempId, {
-        level: 'error',
+      await rpClient.sendLog(test.tempId, {
+        level: 'ERROR',
         message: `${err.stack}`,
-      }); 
+      }).promise;      
     }
 
-    if (test.tempId) {      
-      debug(`${test.tempId}: Test '${test.title}' failed.`);
-      rpClient.finishTestItem(test.tempId, {
-        endTime: test.endTime || rpClient.helpers.now(),
-        status: rp_FAILED,
-        message: `${err.stack}`,
-      });  
-    }
+    rpClient.finishTestItem(test.tempId, {
+      endTime: test.endTime || rpClient.helpers.now(),
+      status: rp_FAILED,
+      message: `${err.stack}`,
+    });  
   });
 
   event.dispatcher.on(event.test.passed, (test, err) => {
@@ -230,7 +232,7 @@ module.exports = (config) => {
   async function attachScreenshot() {
     if (!helper) return undefined;
     
-    const fileName = `${rpClient.helpers.now()}_failed.png`;
+    const fileName = `${rpClient.helpers.now()}.png`;
     try {
       await helper.saveScreenshot(fileName);
     } catch (err) {
@@ -242,7 +244,7 @@ module.exports = (config) => {
     fs.unlinkSync(path.join(global.output_dir, fileName));
 
     return {
-      name: fileName,
+      name: 'failed.png',
       type: 'image/png',
       content,
     }
