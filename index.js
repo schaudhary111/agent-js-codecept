@@ -101,7 +101,7 @@ module.exports = (config) => {
   event.dispatcher.on(event.step.before, (step) => {
     recorder.add(async () => {      
       const parent = await startMetaSteps(step);
-      stepObj = startTestItem(step.toString().slice(0, 300), rp_STEP, parent.tempId);
+      stepObj = startTestItem(step.toString().slice(0, 1000), rp_STEP, parent.tempId);
       step.tempId = stepObj.tempId;
     })
   });
