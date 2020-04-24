@@ -58,6 +58,7 @@ module.exports = (config) => {
   let launchObj;
   let suiteObj;
   let testObj;
+  let stepObj;
   let failedStep;
   let rpClient;
 
@@ -65,6 +66,10 @@ module.exports = (config) => {
   let launchStatus = rp_PASSED;
   let currentMetaSteps = [];
 
+  function logCurrent(data, file) {
+    const obj = stepObj || testObj;
+    if (obj) rpClient.sendLog(obj.tempId, data, file); 
+  }
 
   event.dispatcher.on(event.all.before, async () => {
     launchObj = startLaunch();
@@ -76,6 +81,26 @@ module.exports = (config) => {
       process.exit(1);
     }
     output.print(`📋 Writing results to ReportPortal: ${config.projectName} > ${config.endpoint}`);
+
+    const outputLog = output.log;
+    const outputDebug = output.debug;
+    const outputError = output.error;
+
+    output.log = (message) => {
+      outputLog(message);
+      logCurrent({ level: 'trace', message });
+    }
+
+    output.debug = (message) => {
+      outputDebug(message);
+      logCurrent({ level: 'debug', message });
+    }  
+    
+    output.error = (message) => {
+      outputError(message);
+      logCurrent({ level: 'error', message });
+    }
+
   });
 
   event.dispatcher.on(event.suite.before, (suite) => {
@@ -101,7 +126,7 @@ module.exports = (config) => {
   event.dispatcher.on(event.step.before, (step) => {
     recorder.add(async () => {      
       const parent = await startMetaSteps(step);
-      stepObj = startTestItem(step.toString().slice(0, 1000), rp_STEP, parent.tempId);
+      stepObj = startTestItem(step.toString().slice(0, 300), rp_STEP, parent.tempId);
       step.tempId = stepObj.tempId;
     })
   });
@@ -135,7 +160,7 @@ module.exports = (config) => {
   
       const screenshot = await attachScreenshot();      
 
-      await rpClient.sendLog(step.tempId, {
+      resp = await rpClient.sendLog(step.tempId, {
         level: 'ERROR',
         message: `${err.stack}`,
         time: step.startTime,
@@ -174,6 +199,8 @@ module.exports = (config) => {
       debug(`closing ${currentMetaSteps.length} metasteps for failed test`);
       if (failedStep) await finishStep(failedStep);
       await Promise.all(currentMetaSteps.reverse().map(m => finishStep(m)));
+      stepObj = null;
+      testObj = null;
     });
   });
 
@@ -313,7 +340,9 @@ module.exports = (config) => {
     });
   }
 
-  return this;
+  return {
+    addLog: logCurrent,
+  };
 };
 
 function metaStepsToArray(step) {

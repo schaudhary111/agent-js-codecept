@@ -1,6 +1,6 @@
 {
   "name": "@reportportal/agent-js-codecept",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "Reportportal plugin for Codecept JS tests",
   "repository": {
     "type": "git",
@@ -21,13 +21,13 @@
   "homepage": "https://github.com:reportportal/agent-js-codecept#readme",
   "main": "index.js",
   "dependencies": {
-    "reportportal-client": "5.5.0",
-    "codeceptjs": "2.5.0"
+    "reportportal-client": "5.5.0"
   },
   "scripts": {
     "test": "mocha test/acceptance_test.js --timeout 6000"
   },
   "devDependencies": {
+    "codeceptjs": "2.5.0",    
     "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",

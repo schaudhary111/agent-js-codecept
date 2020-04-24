@@ -1,3 +1,8 @@
+# 0.2.0
+
+* Added debug messages logs
+* Added public API for sending custom logs
+
 # 0.1.0
 
 * Added implementation for nested steps

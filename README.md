@@ -54,6 +54,35 @@ To use this plugin you need to provide the following info:
 - `rerun`: (optional) to enable [rerun](https://github.com/reportportal/documentation/blob/master/src/md/src/DevGuides/rerun.md)
 - `rerunOf`: (optional) UUID of launch you want to rerun. If not specified, report portal will update the latest launch with the same name.
 
+## Public API
+
+### Add Log Message
+
+You can send logs to ReportPortal to current step / test by accessing this plugin from your code:
+
+```js
+const reportPortal = codeceptjs.container.plugins('reportportal');
+reportPortal.addLog({
+  level: 'debug',
+  message: 'your message'
+});
+```
+
+To send attachment, use second parameter:
+
+```js
+const reportPortal = codeceptjs.container.plugins('reportportal');
+reportPortal.addLog({
+  level: 'debug',
+  message: 'your message'
+}, {
+  name: 'screenshot.png',
+  type: 'image/png',
+  content: fs.readFileSync('output/screenshot.png')
+});
+```
+
+See [`sendLog` method of ReportPortal JavaScript Client](https://github.com/reportportal/client-javascript#sendlog) for more oprtions.
 
 ## Todo
 
