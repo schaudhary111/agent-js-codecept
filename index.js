@@ -50,10 +50,6 @@ module.exports = (config) => {
   for (let field of requiredFields) {
     if (!config[field]) throw new Error(`ReportPortal config is invalid. Key ${field} is missing in config.\nRequired fields: ${requiredFields} `)
   }
-
-  if (!config.endpoint.includes('/api')) {
-    throw new Error('Invalid ReportPortal endpoint. No "/api" path specified, use format https://reportportalhost/api/v1 for endpoint');
-  }
   
   let launchObj;
   let suiteObj;
