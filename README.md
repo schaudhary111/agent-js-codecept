@@ -84,6 +84,20 @@ reportPortal.addLog({
 
 See [`sendLog` method of ReportPortal JavaScript Client](https://github.com/reportportal/client-javascript#sendlog) for more oprtions.
 
+### Get Report URL
+
+Once report is posted a special `reportportal.result` event is created. 
+
+You can use it to pass URL of a report into other plugins. For instance, you can use it to send Slack or Email notifications including a link to a report.
+
+```js
+// inside your custom plugin:
+event.dispatcher.on('reportportal.result', (result) => {
+  // use result.link as URL to report
+  console.log('Report was published at', result.link);
+})
+```
+
 ## Todo
 
 - [ ] Support `run-workers` command to aggregate all tests under one launch.

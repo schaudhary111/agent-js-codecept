@@ -51,6 +51,7 @@ module.exports = (config) => {
     if (!config[field]) throw new Error(`ReportPortal config is invalid. Key ${field} is missing in config.\nRequired fields: ${requiredFields} `)
   }
   
+  let reportUrl;
   let launchObj;
   let suiteObj;
   let testObj;
@@ -282,7 +283,9 @@ module.exports = (config) => {
 
       const response = await launch.promise;
 
+      reportUrl = response.link;
       output.print(` 📋 Report #${response.number} saved ➡`, response.link);
+      event.emit('reportportal.result', response);
     } catch (error) {
       console.log(error);
       debug(error);

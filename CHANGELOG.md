@@ -1,3 +1,7 @@
+# 0.2.3
+
+* added `reportportal.result` event to notify when report was created
+
 # 0.2.0
 
 * Added debug messages logs
