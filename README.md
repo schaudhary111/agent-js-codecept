@@ -37,6 +37,7 @@ Example:
       token: 'YOUR_TOKEN',
       endpoint: 'http://localhost:8080/api/v1',
       launchName: 'local launch',
+      projectName: 'Awesome_project'
     }
   //...
 }
@@ -44,10 +45,10 @@ Example:
 
 To use this plugin you need to provide the following info:
 
-- `token`: which can be found by navigating to the user profile page, clicking the username drop-down in the right header and selecting the "Profile" > "UUID" – is a unique user identifier. UUID is used in automated test configuration files for a user authentication instead of a password. It will allow you to post data, without logging it in the UI.
-- `endpoint`: your reportportal host + `api/v1` for instance: `http://localhost:8080/api/v1`
-- `launchName`: the launch name you want, if not provided, the suite title will be used
-- `projectName`: the project that you created in the reportportal UI
+- `token` - required: which can be found by navigating to the user profile page, clicking the username drop-down in the right header and selecting the "Profile" > "UUID" – is a unique user identifier. UUID is used in automated test configuration files for a user authentication instead of a password. It will allow you to post data, without logging it in the UI.
+- `endpoint` - required: your reportportal host + `api/v1` for instance: `http://localhost:8080/api/v1`
+- `launchName` - required: the launch name you want, if not provided, the suite title will be used
+- `projectName` - required: the project that you created in the reportportal UI
 - `launchDescription`: (optional) the description of your launch, if not provided, the description will be empty
 - `launchAttributes`: (optional) the attributes of your launch, if not provided, the attributes will be empty
 - `debug`: (optional) to turn on the debug for reportportal
